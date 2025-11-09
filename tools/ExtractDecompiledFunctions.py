@@ -1,4 +1,4 @@
-# Extract decompiled functions to markdown for Claude AI analysis
+# Extract decompiled functions to markdown for external analysis
 # @author Graffiti Soul Team
 # @category Analysis
 # @keybinding
@@ -6,10 +6,10 @@
 # @toolbar
 
 """
-Ghidra Script: Extract Decompiled Functions for Claude AI
+Ghidra Script: Extract Decompiled Functions
 
 This script extracts decompiled C code from selected functions or address ranges
-and formats them as markdown for analysis with Claude AI.
+and formats them as markdown for external analysis.
 
 Usage:
 1. Open your XBE in Ghidra
