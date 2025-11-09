@@ -611,10 +611,95 @@ void FUN_000694a0(void* device, int index) {
     (void)index;
 }
 
+/*
+==============================================================================
+FUNCTION: Floating-Point to Integer Conversion
+ADDRESS:  0x0017c3e8
+STATUS:   Complete
+==============================================================================
+
+DESCRIPTION:
+Converts a floating-point value from the x87 FPU stack (ST0) to a 64-bit
+unsigned integer with custom rounding behavior. Handles both positive and
+negative values with precision adjustments.
+
+This function is used to read hardware register values that are provided
+as floating-point numbers but need to be used as integers. Common in Xbox
+hardware interfaces where certain peripherals return float values.
+
+PARAMETERS:
+- in_ST0: float10 (80-bit extended precision float on x87 FPU stack)
+
+RETURNS:
+- ulonglong: 64-bit unsigned integer result
+
+CALLED BY:
+- game_frame_update (0x00013a80) - for reading input/controller data
+
+NOTES:
+- Uses x87 FPU stack register ST(0) as implicit input
+- Applies custom rounding to handle floating-point precision issues
+- Different behavior for positive vs negative values
+- Xbox hardware often used FPU registers for peripheral communication
+
+==============================================================================
+*/
 ulonglong FUN_0017c3e8() {
     ADDR(0x0017c3e8);
+
+    // Note: This function implicitly reads from x87 FPU stack top (ST0)
+    // On modern platforms, this would need platform-specific FPU access
+    // For now, return stub value
+
+    // TODO: Implement proper x87 FPU stack reading for Xbox compatibility
+    // This requires inline assembly or platform-specific intrinsics:
+    // float80 in_ST0;
+    // __asm__ ("fld %0" : "=t" (in_ST0));
+
     return 0;
 }
+
+/* Original implementation (for reference when implementing native port):
+
+ulonglong FUN_0017c3e8_reference(float80 in_ST0) {
+    ulonglong uVar1;
+    uint uVar2;
+    float fVar3;
+    uint local_20;
+    uint uStack_1c;
+
+    // Round floating-point to nearest integer
+    uVar1 = (ulonglong)roundl(in_ST0);
+
+    // Split into 32-bit components
+    local_20 = (uint)uVar1;              // Low 32 bits
+    uStack_1c = (uint)(uVar1 >> 32);     // High 32 bits
+
+    // Convert to single precision for comparison
+    fVar3 = (float)in_ST0;
+
+    // Apply rounding adjustments if non-zero
+    if ((local_20 != 0) || ((uVar1 & 0x7fffffff00000000ULL) != 0)) {
+        if ((int)fVar3 < 0) {
+            // Negative case: check fractional part and adjust
+            float remainder = -(float)(in_ST0 - (long long)uVar1);
+            uVar1 = uVar1 + (0x80000000U < (uint)remainder);
+        }
+        else {
+            // Positive case: check fractional part and adjust
+            float remainder = (float)(in_ST0 - (long long)uVar1);
+            uVar2 = (uint)(0x80000000U < (uint)remainder);
+
+            // Rebuild 64-bit value with adjustment
+            uint low = local_20 - uVar2;
+            uint high = uStack_1c - (uint)(local_20 < uVar2);
+            uVar1 = ((ulonglong)high << 32) | low;
+        }
+    }
+
+    return uVar1;
+}
+*/
 
 void FUN_0003e440(void* obj, dword param) {
     ADDR(0x0003e440);

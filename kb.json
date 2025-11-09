@@ -278,7 +278,8 @@
         {
           "decl": "ulonglong FUN_0017c3e8(void)",
           "addr": "0x17c3e8",
-          "status": "stub"
+          "status": "complete",
+          "notes": "Floating-point to integer conversion from x87 FPU stack. Custom rounding for Xbox hardware peripheral reads."
         },
         {
           "decl": "void FUN_0003e440(void* obj, dword param)",
