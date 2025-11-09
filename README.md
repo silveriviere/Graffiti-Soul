@@ -52,7 +52,7 @@ Graffiti Soul is a reverse engineering and decompilation effort for Jet Set Radi
 
 **Phase 1: Decompilation** (Current)
 - Reverse engineer all game functions using Ghidra/IDA
-- Document function addresses and signatures in kb.json
+- Document function addresses and signatures in docs/kb.json
 - Create matching C++ implementations
 - Current progress: Entry point, game loop, subsystem framework
 
@@ -162,10 +162,11 @@ graffiti-soul/
 ├── include/
 │   └── types.h               # Type definitions matching Xbox SDK
 ├── docs/
-│   └── function_template.cpp # Template for decompiled functions
+│   ├── function_template.cpp # Template for decompiled functions
+│   └── kb.json               # Knowledge base - tracks all functions and addresses
 ├── tools/
 │   └── patch.py              # XBE patching tool for testing
-├── kb.json                   # Knowledge base - tracks all functions and addresses
+├── MEMORY_MAP.md             # XBE memory map with function addresses
 ├── requirements.txt          # Python dependencies
 ├── CMakeLists.txt            # Build configuration
 ├── TESTING.md                # Testing guide with xemu
@@ -188,7 +189,7 @@ Contributions are welcome! If you're interested in helping with this preservatio
 - Use descriptive names when the original symbols are unknown
 - Document any assumptions or uncertainties
 - Do not include any copyrighted assets or data
-- Add function entries to `kb.json` with status (`stub`, `partial`, or `complete`)
+- Add function entries to `docs/kb.json` with status (`stub`, `partial`, or `complete`)
 - Test your decompiled functions using the XBE patching workflow (see [TESTING.md](TESTING.md))
 - Verify that patched functions work correctly in xemu before marking as `complete`
 

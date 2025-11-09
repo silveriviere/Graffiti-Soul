@@ -110,11 +110,11 @@ cmake .. \
 cmake --build .
 ```
 
-### 3. Knowledge Base (kb.json)
+### 3. Knowledge Base (docs/kb.json)
 
-The `kb.json` file tracks all discovered functions and their addresses. When you decompile a new function:
+The `docs/kb.json` file tracks all discovered functions and their addresses. When you decompile a new function:
 
-1. Add its entry to `kb.json`
+1. Add its entry to `docs/kb.json`
 2. Mark its status (`stub`, `partial`, or `complete`)
 3. The build system uses this to know which functions to patch
 
@@ -163,7 +163,7 @@ The `tools/patch.py` script:
 
 ### Function Status Levels
 
-Functions in `kb.json` can have these statuses:
+Functions in `docs/kb.json` can have these statuses:
 
 - **`stub`** - Function exists but has no implementation (just returns/empty)
   - Not worth patching, will crash if called
@@ -244,7 +244,7 @@ diff original.asm yours.asm
 
 **Start small:**
 1. Decompile a single, simple function
-2. Mark it as `complete` in kb.json
+2. Mark it as `complete` in docs/kb.json
 3. Patch and test
 4. If it works, move to next function
 5. If it breaks, you know exactly which function is wrong
@@ -271,7 +271,7 @@ void subsystem_frame_update(GameState* gameState) {
 **Solutions**:
 - Verify original XBE path is correct
 - Check that compiled exe exists
-- Ensure kb.json is valid JSON
+- Ensure docs/kb.json is valid JSON
 - Install Python dependencies: `pip install -r requirements.txt`
 
 ### Game Crashes Immediately
@@ -280,13 +280,13 @@ void subsystem_frame_update(GameState* gameState) {
 
 **Possible causes**:
 - Function signature mismatch (wrong parameters/return type)
-- Incorrect function address in kb.json
+- Incorrect function address in docs/kb.json
 - Stack corruption
 - Calling convention mismatch (stdcall vs cdecl)
 
 **Debug**:
 1. Check xemu console output for crash address
-2. Compare against kb.json to identify which function
+2. Compare against docs/kb.json to identify which function
 3. Review that function's decompilation
 
 ### Game Freezes
@@ -390,7 +390,7 @@ Once you have the testing workflow set up:
 1. Start with simple functions (getters, setters, utility functions)
 2. Gradually work up to complex functions
 3. Test frequently - after every function or two
-4. Document any quirks or discoveries in kb.json notes
+4. Document any quirks or discoveries in docs/kb.json notes
 5. Share your findings with the community
 
 Remember: The goal is a **matching decompilation** - your code should produce identical assembly to the original when compiled with the same compiler settings.

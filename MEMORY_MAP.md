@@ -16,7 +16,7 @@ Track original addresses from Ghidra analysis to maintain correspondence with th
 | Address    | Function Name           | Description                          | Status    |
 |------------|-------------------------|--------------------------------------|-----------|
 | 0x00012210 | game_state_constructor  | GameState constructor (0x8840 bytes) | Stub      |
-| 0x000123e0 | FUN_000123e0            | Major update function (called each frame) | Stub   |
+| **0x000123e0** | **subsystem_frame_update** | **Subsystem dispatcher with 5-state machine** | **Decompiled** |
 | 0x00012ae0 | subsystem_constructor   | Subsystem constructor (0x44 bytes)   | TODO      |
 | 0x00012c10 | game_state_init_subsystem | Initialize game subsystems         | Decompiled|
 | 0x00013930 | FUN_00013930            | Major per-frame update function      | Stub      |
@@ -29,8 +29,8 @@ Track original addresses from Ghidra analysis to maintain correspondence with th
 |------------|-------------------------|--------------------------------------|-----------|
 | 0x000659c0 | FUN_000659c0            | Unknown function (called in loop)    | Stub      |
 | 0x00065c80 | FUN_00065c80            | Input callback (button events)       | Stub      |
-| 0x000694a0 | FUN_000694a0            | Read from input device by index      | Stub      |
-| 0x0017c3e8 | FUN_0017c3e8            | Read byte from input device          | Stub      |
+| **0x000694a0** | **FUN_000694a0**        | **Hardware register accessor (bounds-checked)** | **Decompiled** |
+| **0x0017c3e8** | **FUN_0017c3e8**        | **Float to int conversion (x87 FPU)** | **Decompiled** |
 
 ## Subsystem Functions
 
@@ -107,10 +107,10 @@ Track original addresses from Ghidra analysis to maintain correspondence with th
 | 0x0034     | dword                   | Input data (3 bytes combined)        |
 | 0x0038     | dword                   | Input data backup                    |
 | 0x003c     | int                     | Input mode flag                      |
-| 0x0040     | dword                   | Button state flag 1                  |
-| 0x0044     | dword                   | Button state flag 2                  |
-| 0x0048     | dword                   | Button state flag 3                  |
-| 0x004c     | dword                   | Button state flag 4                  |
+| 0x0040     | int                     | State machine flag 0 (subsystem_frame_update) |
+| 0x0044     | int                     | State machine flag 1 (subsystem_frame_update) |
+| 0x0048     | int                     | State machine flag 2 (subsystem_frame_update) |
+| 0x004c     | int                     | State machine flag 3 (subsystem_frame_update) |
 | 0x0050     | int                     | Button pressed flag 1                |
 | 0x0054     | int                     | Button pressed flag 2                |
 | 0x0058     | int                     | Button pressed flag 3                |
@@ -120,6 +120,7 @@ Track original addresses from Ghidra analysis to maintain correspondence with th
 | 0x0068     | int                     | Button pressed flag 7                |
 | 0x006c     | int                     | Button pressed flag 8                |
 | 0x0074     | dword                   | Render control flag                  |
+| 0x0078     | dword                   | Cleared by subsystem_frame_update    |
 | 0x007c     | dword                   | FPS counter (frames per second)      |
 | 0x0080     | dword                   | TPS counter (ticks per second?)      |
 | 0x0084     | dword                   | TPF counter (ticks per frame?)       |
@@ -137,6 +138,13 @@ Track original addresses from Ghidra analysis to maintain correspondence with th
 ## Notes
 
 - **Input System**: Uses byte-reading pattern - likely reading controller analog sticks and button states
+  - Hardware register access via double indirection pattern
+  - FUN_000694a0 provides bounds-checked access to 94-entry float array
+  - FUN_0017c3e8 performs x87 FPU float-to-int conversion for hardware I/O
+- **State Machine**: subsystem_frame_update implements 5-state dispatcher
+  - States controlled by flags at GameState offsets 0x40, 0x44, 0x48, 0x4c
+  - Each state calls different subsystem update/cleanup functions
+  - Performance tracking with QueryPerformanceCounter
 - **Debug System**: Has built-in debug overlay showing FPS, object count, execution/draw times
 - **Frame Timing**: Game runs at ~60 FPS (16ms sleep between frames)
 - **Virtual Functions**: Heavy use of C++ polymorphism via vtables

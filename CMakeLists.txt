@@ -77,7 +77,7 @@ if(ENABLE_PATCHING)
             "${ORIGINAL_XBE}"
             "$<TARGET_FILE:graffiti-soul>"
             "${PATCHED_XBE}"
-            --kb "${CMAKE_SOURCE_DIR}/kb.json"
+            --kb "${CMAKE_SOURCE_DIR}/docs/kb.json"
         DEPENDS graffiti-soul
         COMMENT "Patching XBE with decompiled functions..."
         VERBATIM
