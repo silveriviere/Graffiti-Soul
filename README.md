@@ -69,27 +69,13 @@ Graffiti Soul is a reverse engineering and decompilation effort for Jet Set Radi
 - Create standalone executable that doesn't need emulator or original XBE
 - Support modern platforms: Windows, Linux, macOS, potentially consoles
 
-**Phase 4: Enhancement** (Future)
+**Enhancement** (Future)
 - Add quality-of-life improvements
 - Higher resolutions and widescreen support
 - Improved frame rates
 - Modern controller support
 - Accessibility features
 - Bug fixes and improvements
-
-### Current Status
-
-**Phase 1 Progress:**
-- ✅ Entry point structure
-- ✅ Thread initialization framework
-- ✅ Game state initialization
-- ✅ Main game loop
-- ✅ Subsystem frame update manager (complete)
-- 🔄 30+ subsystem functions (stubs, need implementation)
-
-**Phase 2 Progress:**
-- ✅ Testing infrastructure (xemu patching workflow)
-- ⏳ Function verification (not yet tested in xemu)
 
 Much work remains to fully decompile all game systems, but the foundation is in place.
 
