@@ -179,7 +179,7 @@ def main():
     parser.add_argument('xbe', help='Original JSRF default.xbe file')
     parser.add_argument('exe', help='Compiled executable with our implementations')
     parser.add_argument('output', help='Output patched XBE file')
-    parser.add_argument('--kb', default='kb.json', help='Knowledge base JSON file')
+    parser.add_argument('--kb', default='docs/kb.json', help='Knowledge base JSON file')
 
     args = parser.parse_args()
 
