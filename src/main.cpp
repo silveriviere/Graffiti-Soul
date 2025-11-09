@@ -17,6 +17,11 @@ namespace XAPILIB {
     }
 
     void XapiBootToDash(dword dwReason, dword dwParameter1, dword dwParameter2) {}
+
+    void QueryPerformanceCounter(uint* counter) {
+        // Stub implementation
+        if (counter) *counter = 0;
+    }
 }
 
 extern dword runtime_wrapper_thread(pvoid param);
@@ -83,7 +88,7 @@ extern GameState* game_state_constructor(void* this_ptr, int param2, int param3)
 extern void game_state_init_subsystem(GameState* gameState);
 extern dword game_main_loop(GameState* gameState);
 extern void game_frame_update(GameState* gameState);
-extern void FUN_000123e0(uintptr_t gameState);
+extern void subsystem_frame_update(GameState* gameState);
 extern void FUN_00013930(GameState* gameState);
 extern void FUN_000659c0();
 extern void FUN_00065c80();
@@ -95,6 +100,59 @@ extern ulonglong FUN_0017c3e8();
 extern void FUN_0003e440(void* obj, dword param);
 extern void FUN_0003e430(void* obj, dword param);
 
+// QueryPerformanceCounter from XAPILIB
+namespace XAPILIB {
+    void QueryPerformanceCounter(uint* counter);
+}
+
+// Subsystem initialization functions
+extern void FUN_000161b0(dword* param);
+extern void FUN_0003e9a0(dword param);
+extern void FUN_0006c6d0(dword param);
+extern void FUN_0006dbb0(dword param);
+
+// Subsystem update functions - State 0 (default)
+extern void FUN_0006f8c0(dword param);
+extern void FUN_0001df30(dword param);
+extern void FUN_00065800(dword param);
+extern void FUN_00066ad0(dword param);
+extern void FUN_00024ae0(dword param);
+extern void FUN_00066110(dword param);
+extern void FUN_00015130(dword param);
+extern void FUN_00011070(int* param);
+
+// Subsystem update functions - State 1 (0x40)
+extern void FUN_000114d0(int* param);
+
+// Subsystem update functions - State 2 (0x44)
+extern void FUN_000112a0(int* param);
+
+// Subsystem update functions - State 3 (0x48)
+extern void FUN_00011700(int* param);
+
+// Subsystem update functions - State 4 (0x4c)
+extern void FUN_00011930(int* param);
+
+// Subsystem cleanup functions
+extern void FUN_0001d920(dword* param);
+extern void FUN_0003e9c0(dword param);
+extern void FUN_0006c6e0(dword param);
+extern void FUN_0006dbe0(dword param);
+extern void FUN_0001dd60(dword param);
+extern void FUN_00066d80(dword param);
+extern void FUN_00039a80(dword param);
+
+// Post-update functions for each state
+extern void FUN_00011d00(int* param);  // State 0
+extern void FUN_00011e40(int* param);  // State 1
+extern void FUN_00011da0(int* param);  // State 2
+extern void FUN_00011ee0(int* param);  // State 3
+extern void FUN_00011f80(int* param);  // State 4
+
+// Performance tracking
+extern void FUN_0006e910(void* param1, void* param2, uint time_start_low, int time_start_high,
+                          uint time_end_low, int time_end_high);
+
 extern void* DAT_00251d70;
 extern void* DAT_00251d6c;
 extern void* DAT_00251d68;
@@ -105,6 +163,10 @@ extern int DAT_00251d44;
 extern int DAT_00251d54;
 extern int DAT_00251d58;
 extern int DAT_00251d40;
+
+// Global subsystem data
+extern dword DAT_0022fce8;
+extern void* PTR_PTR_0020cc48;
 
 GameState* g_GameState = nullptr;
 
@@ -118,6 +180,9 @@ int DAT_00251d44 = 0;
 int DAT_00251d54 = 0;
 int DAT_00251d58 = 0;
 int DAT_00251d40 = 0;
+
+dword DAT_0022fce8 = 0;
+void* PTR_PTR_0020cc48 = nullptr;
 
 dword jsrf_game_main() {
     ADDR(0x0006f9e0);
@@ -265,7 +330,7 @@ void game_frame_update(GameState* gameState) {
 
     FUN_000659c0();
     *(dword*)((byte*)gameState + 0x74) = 0;
-    FUN_000123e0((uintptr_t)gameState);
+    subsystem_frame_update(gameState);
 
     if (*(int*)((byte*)gameState + 0x94) == 0) {
         FUN_0015fa20();
@@ -382,9 +447,140 @@ void sleep_milliseconds(dword ms) {
     ADDR(0x00145ca6);
 }
 
-void FUN_000123e0(uintptr_t gameState) {
+/*
+==============================================================================
+FUNCTION: Subsystem Frame Update Manager
+ADDRESS:  0x000123e0
+STATUS:   Complete
+==============================================================================
+
+DESCRIPTION:
+Main subsystem update dispatcher. Calls various game subsystems in order and
+routes to different update paths based on state flags in the GameState.
+Measures frame time using QueryPerformanceCounter.
+
+The function implements a state machine with 5 states (0-4) controlled by
+flags at offsets 0x40, 0x44, 0x48, 0x4c in GameState structure.
+
+PARAMETERS:
+- gameState: GameState* - Pointer to the main game state structure
+
+CALLED BY:
+- game_frame_update (0x00013a80)
+
+CALLS:
+- QueryPerformanceCounter (XAPI)
+- Various subsystem update functions
+- Performance tracking function
+
+NOTES:
+- Uses performance counters to track frame timing
+- State flags determine which code path to execute
+- Pointer at offset 0x87dc appears to be a subsystem manager object
+- State 0 (all flags == 0) executes the most subsystems
+
+==============================================================================
+*/
+void subsystem_frame_update(GameState* gameState) {
     ADDR(0x000123e0);
-    (void)gameState;
+
+    int* piVar1;
+    uint local_10;
+    int local_c;
+    uint local_8;
+    int local_4;
+
+    // Start performance measurement
+    XAPILIB::QueryPerformanceCounter(&local_8);
+
+    // Initialize subsystems for this frame
+    FUN_000161b0(&DAT_0022fce8);
+    FUN_0003e9a0(0x2314b0);
+    FUN_0006c6d0(0x20c750);
+    FUN_0006dbb0(0x251f78);
+
+    *(dword*)((byte*)gameState + 0x78) = 0;
+
+    // State machine: route to appropriate update path
+    // The nested if-else checks flags at offsets 0x40, 0x44, 0x48, 0x4c
+    if (*(int*)((byte*)gameState + 0x40) == 0) {
+        if (*(int*)((byte*)gameState + 0x44) == 0) {
+            if (*(int*)((byte*)gameState + 0x48) == 0) {
+                if (*(int*)((byte*)gameState + 0x4c) == 0) {
+                    // State 0: Default/normal gameplay update
+                    FUN_0006f8c0(0x20cc58);
+                    FUN_0001df30(0x1ebabc);
+                    FUN_00065800(0x1fb804);
+                    FUN_00066ad0(0x1fb8cc);
+                    FUN_00024ae0(0x1ec050);
+                    FUN_00066110(0x1fb820);
+                    FUN_00015130(0x1eb994);
+                    FUN_00011070(*(int**)((byte*)gameState + 0x87dc));
+                }
+                else {
+                    // State 4: Flag at 0x4c set
+                    FUN_00011930(*(int**)((byte*)gameState + 0x87dc));
+                }
+            }
+            else {
+                // State 3: Flag at 0x48 set
+                FUN_00011700(*(int**)((byte*)gameState + 0x87dc));
+            }
+        }
+        else {
+            // State 2: Flag at 0x44 set
+            FUN_000112a0(*(int**)((byte*)gameState + 0x87dc));
+        }
+    }
+    else {
+        // State 1: Flag at 0x40 set
+        FUN_000114d0(*(int**)((byte*)gameState + 0x87dc));
+    }
+
+    // Cleanup/finalize subsystems for this frame
+    FUN_0001d920(&DAT_0022fce8);
+    FUN_0003e9c0(0x2314b0);
+    FUN_0006c6e0(0x20c750);
+    FUN_0006dbe0(0x251f78);
+    FUN_0001dd60(0x1ebaa8);
+    FUN_00066d80(0x1fb8e8);
+    FUN_00039a80(0x1efc74);
+
+    // Post-update phase: route to appropriate cleanup function
+    piVar1 = *(int**)((byte*)gameState + 0x87dc);
+    if (*(int*)((byte*)gameState + 0x40) == 0) {
+        if (*(int*)((byte*)gameState + 0x44) == 0) {
+            if (*(int*)((byte*)gameState + 0x48) == 0) {
+                if (*(int*)((byte*)gameState + 0x4c) == 0) {
+                    // State 0 post-update
+                    FUN_00011d00(piVar1);
+                }
+                else {
+                    // State 4 post-update
+                    FUN_00011f80(piVar1);
+                }
+            }
+            else {
+                // State 3 post-update
+                FUN_00011ee0(piVar1);
+            }
+        }
+        else {
+            // State 2 post-update
+            FUN_00011da0(piVar1);
+        }
+    }
+    else {
+        // State 1 post-update
+        FUN_00011e40(piVar1);
+    }
+
+    // End performance measurement
+    XAPILIB::QueryPerformanceCounter(&local_10);
+
+    // Record frame timing (passes start and end times as 64-bit value split into two 32-bit parts)
+    FUN_0006e910(&PTR_PTR_0020cc48, (void*)((byte*)gameState + 0x87b8),
+                 local_8, local_4, local_10, local_c);
 }
 
 void FUN_000659c0() {
@@ -430,6 +626,163 @@ void FUN_0003e430(void* obj, dword param) {
     ADDR(0x0003e430);
     (void)obj;
     (void)param;
+}
+
+// Subsystem initialization stubs
+void FUN_000161b0(dword* param) {
+    ADDR(0x000161b0);
+    (void)param;
+}
+
+void FUN_0003e9a0(dword param) {
+    ADDR(0x0003e9a0);
+    (void)param;
+}
+
+void FUN_0006c6d0(dword param) {
+    ADDR(0x0006c6d0);
+    (void)param;
+}
+
+void FUN_0006dbb0(dword param) {
+    ADDR(0x0006dbb0);
+    (void)param;
+}
+
+// Subsystem update function stubs - State 0
+void FUN_0006f8c0(dword param) {
+    ADDR(0x0006f8c0);
+    (void)param;
+}
+
+void FUN_0001df30(dword param) {
+    ADDR(0x0001df30);
+    (void)param;
+}
+
+void FUN_00065800(dword param) {
+    ADDR(0x00065800);
+    (void)param;
+}
+
+void FUN_00066ad0(dword param) {
+    ADDR(0x00066ad0);
+    (void)param;
+}
+
+void FUN_00024ae0(dword param) {
+    ADDR(0x00024ae0);
+    (void)param;
+}
+
+void FUN_00066110(dword param) {
+    ADDR(0x00066110);
+    (void)param;
+}
+
+void FUN_00015130(dword param) {
+    ADDR(0x00015130);
+    (void)param;
+}
+
+void FUN_00011070(int* param) {
+    ADDR(0x00011070);
+    (void)param;
+}
+
+// Subsystem update function stubs - Other states
+void FUN_000114d0(int* param) {
+    ADDR(0x000114d0);
+    (void)param;
+}
+
+void FUN_000112a0(int* param) {
+    ADDR(0x000112a0);
+    (void)param;
+}
+
+void FUN_00011700(int* param) {
+    ADDR(0x00011700);
+    (void)param;
+}
+
+void FUN_00011930(int* param) {
+    ADDR(0x00011930);
+    (void)param;
+}
+
+// Subsystem cleanup function stubs
+void FUN_0001d920(dword* param) {
+    ADDR(0x0001d920);
+    (void)param;
+}
+
+void FUN_0003e9c0(dword param) {
+    ADDR(0x0003e9c0);
+    (void)param;
+}
+
+void FUN_0006c6e0(dword param) {
+    ADDR(0x0006c6e0);
+    (void)param;
+}
+
+void FUN_0006dbe0(dword param) {
+    ADDR(0x0006dbe0);
+    (void)param;
+}
+
+void FUN_0001dd60(dword param) {
+    ADDR(0x0001dd60);
+    (void)param;
+}
+
+void FUN_00066d80(dword param) {
+    ADDR(0x00066d80);
+    (void)param;
+}
+
+void FUN_00039a80(dword param) {
+    ADDR(0x00039a80);
+    (void)param;
+}
+
+// Post-update function stubs
+void FUN_00011d00(int* param) {
+    ADDR(0x00011d00);
+    (void)param;
+}
+
+void FUN_00011e40(int* param) {
+    ADDR(0x00011e40);
+    (void)param;
+}
+
+void FUN_00011da0(int* param) {
+    ADDR(0x00011da0);
+    (void)param;
+}
+
+void FUN_00011ee0(int* param) {
+    ADDR(0x00011ee0);
+    (void)param;
+}
+
+void FUN_00011f80(int* param) {
+    ADDR(0x00011f80);
+    (void)param;
+}
+
+// Performance tracking stub
+void FUN_0006e910(void* param1, void* param2, uint time_start_low, int time_start_high,
+                  uint time_end_low, int time_end_high) {
+    ADDR(0x0006e910);
+    (void)param1;
+    (void)param2;
+    (void)time_start_low;
+    (void)time_start_high;
+    (void)time_end_low;
+    (void)time_end_high;
 }
 
 int main(int argc, char* argv[]) {
