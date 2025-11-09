@@ -2,6 +2,26 @@
 
 This guide explains how to test your decompiled functions by patching them into the original JSRF XBE and running in xemu (Xbox emulator).
 
+## Important: xemu is for Verification, Not the End Goal
+
+**This testing workflow is a development tool, not the final product.**
+
+The ultimate goal of this project is a **complete, standalone native port** that runs on modern hardware (PC, Linux, macOS, etc.) without requiring:
+- The original Xbox XBE
+- An emulator
+- Original Xbox hardware
+- Any proprietary game files
+
+**Why test with xemu then?**
+
+During decompilation, we need to verify that our reimplemented functions behave identically to the originals. By patching our code into the original XBE and running it in xemu, we can:
+- Confirm behavioral correctness before moving to next function
+- Catch bugs and mistakes early
+- Ensure we're creating a matching decompilation
+- See our code actually running in the game
+
+Think of xemu testing as "unit testing" for decompilation. Once all functions are verified and the entire game is decompiled, we'll move to **Phase 3** (see README roadmap) where we replace Xbox-specific APIs with modern equivalents and create a truly standalone port.
+
 ## Overview
 
 **Progressive Decompilation** is a technique where you gradually replace functions in the original game binary with your decompiled versions and test them to verify correctness. This approach:
@@ -10,6 +30,7 @@ This guide explains how to test your decompiled functions by patching them into 
 - Verifies that decompiled code matches original behavior
 - Catches errors early in the decompilation process
 - Enables you to see your code running in the actual game
+- Builds confidence that the decompilation is accurate
 
 ## Prerequisites
 
@@ -374,4 +395,87 @@ Once you have the testing workflow set up:
 
 Remember: The goal is a **matching decompilation** - your code should produce identical assembly to the original when compiled with the same compiler settings.
 
+## Path to Native Port
+
+Once all functions are decompiled and verified (Phase 1 & 2 complete), we'll transition to **Phase 3: Native Port**. This involves:
+
+### 1. Platform Abstraction Layer
+
+Create platform-independent interfaces for:
+- **Graphics**: Replace Direct3D 8 with Vulkan/OpenGL/Metal
+- **Audio**: Replace DirectSound with SDL2/OpenAL/modern audio APIs
+- **Input**: Replace Xbox controller API with SDL2/modern input
+- **File I/O**: Replace Xbox file system with standard OS APIs
+- **Networking**: Add cross-platform networking (for multiplayer)
+
+### 2. Xbox API Replacement
+
+The current code uses Xbox-specific APIs from `XAPILIB`:
+- `CreateThread` → `std::thread` or platform threads
+- `QueryPerformanceCounter` → `std::chrono` or platform timers
+- `XapiBootToDash` → Application exit handling
+- Memory management → Standard allocators
+
+### 3. Asset Loading
+
+Currently assumes Xbox DVD file layout. Need to:
+- Support loading from extracted game files
+- Handle different endianness if needed
+- Support modern file formats alongside originals
+- Implement streaming for large assets
+
+### 4. Build System Changes
+
+Transition from Xbox-targeted build to native builds:
+- Remove `-target i386-pc-win32` flags
+- Remove XBE patching (no longer needed)
+- Add platform-specific build configurations
+- Package as standalone executables for each platform
+
+### 5. Testing Native Port
+
+Instead of testing in xemu:
+- Run directly on your development machine
+- Test on multiple platforms (Windows, Linux, macOS)
+- Performance profiling and optimization
+- Modern graphics testing (4K, ultrawide, etc.)
+
+### Example: Direct3D → Vulkan Translation
+
+Current (Xbox):
+```cpp
+// Uses Direct3D 8 for rendering
+d3dDevice->BeginScene();
+d3dDevice->DrawPrimitive(...);
+d3dDevice->EndScene();
+```
+
+Future (Native):
+```cpp
+// Platform abstraction
+renderer->BeginFrame();
+renderer->DrawPrimitive(...);
+renderer->EndFrame();
+
+// Implementations for each backend:
+// - VulkanRenderer
+// - OpenGLRenderer
+// - MetalRenderer (macOS/iOS)
+// - D3D12Renderer (Windows)
+```
+
+### When to Transition?
+
+We'll begin Phase 3 when:
+- ✅ All game functions are decompiled
+- ✅ All functions verified in xemu
+- ✅ Game runs start-to-finish with decompiled code
+- ✅ Community consensus on architecture
+
+At that point, xemu testing becomes obsolete, and we focus entirely on the standalone native port.
+
+---
+
 Happy decompiling! 🎮
+
+*Remember: xemu is a tool to help us build something better - a native port that will outlive the emulator itself.*
