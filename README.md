@@ -69,6 +69,8 @@ Much work remains to fully decompile all game systems.
 
 ### Build Instructions
 
+NOTE THIS PROJECT IS CURRENTLY NOT FUNCTIONAL!!!
+
 ```bash
 # Clone the repository
 git clone https://github.com/yourusername/graffiti-soul.git
