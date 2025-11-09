@@ -8,6 +8,7 @@ using byte = uint8_t;
 using word = uint16_t;
 using dword = uint32_t;
 using qword = uint64_t;
+using ulonglong = uint64_t;  // Ghidra type for unsigned long long
 
 using sbyte = int8_t;
 using sword = int16_t;
