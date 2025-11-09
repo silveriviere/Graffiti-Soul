@@ -4,25 +4,25 @@ A decompilation project for **Jet Set Radio Future** (JSRF) for the original Xbo
 
 ## Important Legal Notice
 
-### ⚠️ Game Preservation and Educational Use Only
+### Game Preservation and Educational Use Only
 
-This project exists solely for **game preservation, research, and educational purposes**. This repository does NOT contain and will NEVER distribute:
+This project exists for game preservation, research, and educational purposes. This repository does not contain and will never distribute:
 
 - Game ROMs, ISOs, or executables
 - Original game assets (textures, models, sounds, music, etc.)
 - Copyrighted game data of any kind
 - Any material that would allow you to play the game without owning it
 
-### 🎮 You MUST Own a Legal Copy of the Game
+### You Must Own a Legal Copy of the Game
 
-**THIS PROJECT REQUIRES YOU TO OWN A LEGITIMATE COPY OF JET SET RADIO FUTURE.**
+This project requires you to own a legitimate copy of Jet Set Radio Future.
 
 To use this project, you must:
-1. **Purchase** or own an original physical copy of Jet Set Radio Future for Xbox
+1. Purchase or own an original physical copy of Jet Set Radio Future for Xbox
 2. Legally extract the executable from your own game disc
 3. Use your own legally obtained game assets
 
-**We do not condone, support, or facilitate piracy in any form.**
+We do not condone, support, or facilitate piracy in any form.
 
 ### Copyright and Trademark Notice
 
@@ -38,18 +38,18 @@ This is a fan-made preservation project created to:
 
 ## About This Project
 
-Graffiti Soul is a reverse engineering and decompilation effort aimed at understanding and preserving the technical implementation of Jet Set Radio Future, one of the Xbox's most beloved titles. The goal is to create a matching decompilation that can be compiled back into functionally equivalent code.
+Graffiti Soul is a reverse engineering and decompilation effort for Jet Set Radio Future, one of the original Xbox's most beloved titles. The goal is to create a matching decompilation that accurately reconstructs the original code.
 
 ### Why Decompile?
 
-- **Preservation**: As original Xbox hardware ages and fails, preserving games becomes critical
-- **Education**: Understanding how commercial games were developed provides valuable learning opportunities
-- **Modding**: Enabling the community to fix bugs and create mods (with legal game copies)
-- **Portability**: Potentially enabling the game to run on modern systems (for legal owners)
+- **Preservation**: Original Xbox hardware is aging and failing. Preserving these games in a documented, understandable form helps ensure they aren't lost to time.
+- **Education**: Understanding how commercial games were actually built provides valuable insights into game development techniques from that era.
+- **Modding**: A complete decompilation allows the community to fix bugs, add features, and create mods (assuming you own the game legally).
+- **Portability**: Eventually, this could enable the game to run on modern hardware for people who own legitimate copies.
 
 ### Project Status
 
-🚧 **Early Development** - This project is in its initial stages.
+This project is in early development and very much a work in progress.
 
 Currently implemented:
 - Basic XBE entry point structure
@@ -106,12 +106,12 @@ graffiti-soul/
 
 ## Contributing
 
-Contributions are welcome! If you're interested in helping preserve this game:
+Contributions are welcome! If you're interested in helping with this preservation effort:
 
-1. You **must** own a legitimate copy of JSRF
+1. You must own a legitimate copy of JSRF
 2. Use tools like Ghidra or IDA Pro to analyze your legally obtained executable
 3. Document your findings and create matching C++ implementations
-4. Submit pull requests with clear documentation
+4. Submit pull requests with clear documentation of what you've decompiled
 
 ### Decompilation Guidelines
 
@@ -124,22 +124,26 @@ Contributions are welcome! If you're interested in helping preserve this game:
 ## Legal FAQ
 
 **Q: Is this legal?**
-A: Reverse engineering for interoperability, preservation, and educational purposes is generally protected under fair use doctrine in many jurisdictions. However, you must own a legal copy of the game.
 
-**Q: Can I play the game with this?**
-A: This decompilation alone will not let you play the game. You need the original game assets, which you must obtain legally from your own copy.
+A: Reverse engineering for interoperability, preservation, and educational purposes is generally protected under fair use in many jurisdictions. That said, you must own a legal copy of the game to use this project ethically and legally.
 
-**Q: Will this repository provide game files?**
-A: **NO.** We will never distribute any copyrighted game files, assets, or executable code from the original game.
+**Q: Can I play the game with just this code?**
 
-**Q: Can I use this for emulation?**
-A: This is not an emulator. This is a native reimplementation that requires you to have legal access to the game's assets.
+A: No. This decompilation is just code - it doesn't include any of the actual game content like graphics, sounds, music, or levels. You would need the original game assets from your legally owned copy.
+
+**Q: Will you ever distribute game files?**
+
+A: No. We will never distribute copyrighted game files, assets, or executable code from the original game. This repository only contains our reverse-engineered recreation of the code structure.
+
+**Q: Is this an emulator?**
+
+A: No. This is a native reimplementation of the game code. It's more like a port that would still require access to the original game's data files.
 
 ## Disclaimer
 
 This software is provided "as is" without warranty of any kind. The developers and contributors assume no liability for any misuse of this code. This project is for educational and preservation purposes only.
 
-**Support the original creators: If you enjoy Jet Set Radio Future, please purchase legitimate SEGA products to support the company that created this masterpiece.**
+If you love Jet Set Radio Future, please support SEGA by purchasing their games. The original developers created something special, and they deserve to be compensated for their work.
 
 ## Resources
 
@@ -152,4 +156,4 @@ This decompilation project is released for educational and preservation purposes
 
 ---
 
-**Remember: This project is only legal and ethical if you own a legitimate copy of the game. Please support game preservation by purchasing games legally.**
+Remember: This project is only legal and ethical if you own a legitimate copy of the game. Please support game preservation by purchasing games legally.
