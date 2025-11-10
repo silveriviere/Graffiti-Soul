@@ -57,8 +57,8 @@
         {
           "decl": "void subsystem_frame_update(GameState* gameState)",
           "addr": "0x123e0",
-          "status": "complete",
-          "notes": "Main subsystem dispatcher with state machine for different update paths"
+          "status": "partial",
+          "notes": "Main subsystem dispatcher with state machine for different update paths. Needs proper GameState struct before marking complete."
         },
         {
           "decl": "void sleep_milliseconds(dword ms)",
@@ -273,14 +273,14 @@
         {
           "decl": "float FUN_000694a0(void* device, int index)",
           "addr": "0x694a0",
-          "status": "complete",
-          "notes": "Float array accessor for hardware registers. Bounds-checked read from float array. Returns register value or 0.0 if out of bounds."
+          "status": "partial",
+          "notes": "Float array accessor for hardware registers. Bounds-checked read from float array. Returns register value or 0.0 if out of bounds. Needs proper device struct definition."
         },
         {
           "decl": "ulonglong FUN_0017c3e8(void)",
           "addr": "0x17c3e8",
-          "status": "complete",
-          "notes": "Floating-point to integer conversion from x87 FPU stack. Custom rounding for Xbox hardware peripheral reads."
+          "status": "stub",
+          "notes": "Floating-point to integer conversion from x87 FPU stack. Custom rounding for Xbox hardware peripheral reads. Currently just returns 0."
         },
         {
           "decl": "void FUN_0003e440(void* obj, dword param)",
